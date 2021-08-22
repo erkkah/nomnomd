@@ -71,6 +71,29 @@ const style = css`
         --maxwidth: 1280px;
 
         /*
+         * HSL - based calculated palette
+         */
+        --h0: var(--startH);
+        --h1: calc(var(--h0) + var(--stepH));
+        --h2: calc(var(--h1) + var(--stepH));
+        --h3: calc(var(--h2) + var(--stepH));
+
+        --s0: var(--startS);
+        --s1: calc(var(--s0) * var(--scaleS));
+        --s2: calc(var(--s1) * var(--scaleS));
+        --s3: calc(var(--s2) * var(--scaleS));
+
+        --l0: var(--startL);
+        --l1: calc(var(--l0) * var(--scaleL));
+        --l2: calc(var(--l1) * var(--scaleL));
+        --l3: calc(var(--l2) * var(--scaleL));
+
+        --cc0: hsl(var(--h0), var(--s0), var(--l0));
+        --cc1: hsl(var(--h1), var(--s1), var(--l1));
+        --cc2: hsl(var(--h2), var(--s2), var(--l2));
+        --cc3: hsl(var(--h3), var(--s3), var(--l3));
+
+        /*
          * Four-color palette from dark to light, or the other way around.
          */
         --c0: var(--color0, #111111);
@@ -291,24 +314,24 @@ const style = css`
     }
 `;
 
-export const reloadScript = `
-let lastUpdated = 0;
+export const reloadScript = (function reloader() {
+    let lastUpdated = 0;
 
-function checkLastUpdated() {
-    var req = new XMLHttpRequest();
-    req.addEventListener("load", () => {
-        const response = JSON.parse(req.response);
-        const updated = response.updated || lastUpdated;
-        if (lastUpdated > 0 && updated > lastUpdated) {
-            location.reload();
-        } else {
-            lastUpdated = updated;
-            setTimeout(checkLastUpdated, 1000);
-        }
-    });
-    req.open("GET", document.URL + "?lastUpdated");
-    req.send();
-}
-
-setTimeout(checkLastUpdated, 1000);
-`;
+    function checkLastUpdated() {
+        var req = new XMLHttpRequest();
+        req.addEventListener("load", () => {
+            const response = JSON.parse(req.response);
+            const updated = response.updated || lastUpdated;
+            if (lastUpdated > 0 && updated > lastUpdated) {
+                location.reload();
+            } else {
+                lastUpdated = updated;
+                setTimeout(checkLastUpdated, 1000);
+            }
+        });
+        req.open("GET", document.URL + "?lastUpdated");
+        req.send();
+    }
+    
+    setTimeout(checkLastUpdated, 1000);    
+}).toString() + ";reloader();";
