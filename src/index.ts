@@ -3,6 +3,7 @@ import { basename, join } from "path";
 
 import MarkdownIt from "markdown-it";
 import Highlight from "highlight.js";
+import Frontmatter from "markdown-it-front-matter";
 import arg from "arg";
 
 import * as pkg from "../package.json";
@@ -71,15 +72,33 @@ function getMarkdownWithPlugins(): MarkdownIt {
     return md;
 }
 
-function processFiles(files: string[], target: string, themeCSS?: string, codeTheme?: string) {
+function processFiles(
+    files: string[],
+    target: string,
+    themeCSS?: string,
+    codeTheme?: string
+) {
     const md = getMarkdownWithPlugins();
+
+    let frontmatterData: Record<string, string> = {};
+
+    md.use(Frontmatter, (fm) => {
+        frontmatterData = JSON.parse(fm);
+    });
 
     mkdirSync(target, { recursive: true });
 
     for (const file of files) {
         const text = readFileSync(file);
         const content = md.render(text.toString());
-        const html = wrapContent(content, { themeCSS, codeTheme });
+
+        const html = wrapContent(content, {
+            themeCSS,
+            codeTheme,
+            title: frontmatterData.title,
+            header: frontmatterData.header,
+            footer: frontmatterData.footer,
+        });
         writeFileSync(join(target, basename(file, ".md") + ".html"), html);
     }
 }
