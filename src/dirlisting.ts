@@ -21,7 +21,7 @@ function renderDirListing(path: string, alt?: string): string {
     const entries = readdirSync(path, { withFileTypes: true });
     const items = entries.filter(
         (entry) => entry.isFile() && entry.name.endsWith(".md")
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
 
     const listSource = items.map((file) => {
         const html = `${basename(file.name, ".md")}.html`;
