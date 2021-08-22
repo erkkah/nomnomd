@@ -1,5 +1,13 @@
-import { mkdirSync, readFileSync, writeFileSync } from "fs";
-import { basename, join } from "path";
+import "source-map-support/register";
+import {
+    mkdirSync,
+    mkdtempSync,
+    readFileSync,
+    rmSync,
+    watch,
+    writeFileSync,
+} from "fs";
+import { basename, dirname, join } from "path";
 
 import MarkdownIt from "markdown-it";
 import Highlight from "highlight.js";
@@ -10,7 +18,10 @@ import * as pkg from "../package.json";
 import { dirListing } from "./dirlisting";
 import { makeInclude } from "./include";
 import { nomnomlIt } from "./nomnoml";
-import { wrapContent } from "./html";
+import { reloadScript, wrapContent } from "./html";
+import { serve } from "./serve";
+import { createHash } from "crypto";
+import { tmpdir } from "os";
 
 export async function main(args: string[]) {
     const parsed = arg(
@@ -19,6 +30,7 @@ export async function main(args: string[]) {
             "--out": String,
             "--theme": String,
             "--hltheme": String,
+            "--serve": Number,
         },
         {
             argv: args,
@@ -26,15 +38,34 @@ export async function main(args: string[]) {
     );
 
     const files = parsed["_"];
-    const target = parsed["--out"] ?? "build";
 
     if (!files.length || parsed["--help"]) {
         console.log(`nomnomd version ${pkg.version}
 
 Usage:
-    nomnomd [--help] [--out DIR] [--theme FILE] [--hltheme <hljs-theme>] <files..>
+    nomnomd [options] <files...>
+
+    Options:
+        [--help]
+        [--out DIR]
+        [--theme FILE]
+        [--hltheme <hljs-theme>]
+        [--serve <port>]
         `);
         process.exit(0);
+    }
+
+    let target = parsed["--out"] ?? "build";
+
+    const servePort = parsed["--serve"];
+    if (servePort) {
+        target = mkdtempSync(join(tmpdir(), "nomnomd"));
+        const cleanup = () => {
+            rmSync(target, { recursive: true });
+            process.exit(0);
+        };
+        process.on("exit", cleanup);
+        process.on("SIGINT", () => process.exit(0));
     }
 
     const themeFile = parsed["--theme"];
@@ -42,8 +73,44 @@ Usage:
     if (themeFile) {
         themeCSS = readFileSync(themeFile).toString();
     }
+
     const codeTheme = parsed["--hltheme"];
-    processFiles(files, target, themeCSS, codeTheme);
+    processFiles(files, target, themeCSS, codeTheme, !!servePort);
+
+    if (servePort) {
+        watchFiles(files, (file) => {
+            console.log(`${file} updated, rebuilding...`);
+            processFiles([file], target, themeCSS, codeTheme, true);
+        });
+        const fallback = files[0].replace(/[.]md$/, ".html");
+        serve(target, servePort, fallback);
+        console.log(`Serving on port ${servePort}`);
+    }
+}
+
+function hashFile(path: string): string {
+    const contents = readFileSync(path);
+    return createHash("sha256").update(contents).digest().toString("hex");
+}
+
+function watchFiles(files: string[], cb: (file: string) => void) {
+    const watchedFiles = files
+        .map((file) => ({
+            [file]: hashFile(file),
+        }))
+        .reduce((previous, current) => {
+            return { ...previous, ...current };
+        });
+
+    for (const file of files) {
+        watch(file, () => {
+            const hash = hashFile(file);
+            if (watchedFiles[file] != hash) {
+                watchedFiles[file] = hash;
+                cb(file);
+            }
+        });
+    }
 }
 
 function getMarkdownWithPlugins(): MarkdownIt {
@@ -76,7 +143,8 @@ function processFiles(
     files: string[],
     target: string,
     themeCSS?: string,
-    codeTheme?: string
+    codeTheme?: string,
+    hotReload?: boolean
 ) {
     const md = getMarkdownWithPlugins();
 
@@ -88,6 +156,8 @@ function processFiles(
 
     mkdirSync(target, { recursive: true });
 
+    const script = hotReload ? reloadScript : "";
+
     for (const file of files) {
         const text = readFileSync(file);
         const content = md.render(text.toString());
@@ -98,7 +168,14 @@ function processFiles(
             title: frontmatterData.title,
             header: frontmatterData.header,
             footer: frontmatterData.footer,
+            script,
         });
-        writeFileSync(join(target, basename(file, ".md") + ".html"), html);
+        mkdirSync(join(target, dirname(file)), {
+            recursive: true,
+        });
+        writeFileSync(
+            join(target, dirname(file), basename(file, ".md") + ".html"),
+            html
+        );
     }
 }

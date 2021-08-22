@@ -6,6 +6,7 @@ export interface WrapOptions {
     footer?: string;
     themeCSS?: string;
     codeTheme?: string;
+    script?: string;
 }
 
 export function wrapContent(content: string, options?: WrapOptions): string {
@@ -19,6 +20,7 @@ export function wrapContent(content: string, options?: WrapOptions): string {
         style,
         themeCSS: options?.themeCSS ?? "",
         codeTheme: options?.codeTheme ?? "agate",
+        script: options?.script ?? "",
     });
 }
 
@@ -56,6 +58,7 @@ const template = html`
                     </footer>
                 </div>
             </div>
+            <script>{script}</script>
         </body>
     </html>
 `;
@@ -286,4 +289,26 @@ const style = css`
     img {
         max-width: 90vw;
     }
+`;
+
+export const reloadScript = `
+let lastUpdated = 0;
+
+function checkLastUpdated() {
+    var req = new XMLHttpRequest();
+    req.addEventListener("load", () => {
+        const response = JSON.parse(req.response);
+        const updated = response.updated || lastUpdated;
+        if (lastUpdated > 0 && updated > lastUpdated) {
+            location.reload();
+        } else {
+            lastUpdated = updated;
+            setTimeout(checkLastUpdated, 1000);
+        }
+    });
+    req.open("GET", document.URL + "?lastUpdated");
+    req.send();
+}
+
+setTimeout(checkLastUpdated, 1000);
 `;
