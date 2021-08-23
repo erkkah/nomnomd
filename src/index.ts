@@ -7,7 +7,7 @@ import {
     watch,
     writeFileSync,
 } from "fs";
-import { basename, dirname, join } from "path";
+import { basename, dirname, join, resolve } from "path";
 
 import MarkdownIt from "markdown-it";
 import Highlight from "highlight.js";
@@ -22,6 +22,7 @@ import { reloadScript, wrapContent } from "./html";
 import { serve } from "./serve";
 import { createHash } from "crypto";
 import { tmpdir } from "os";
+import { isFile } from "./files";
 
 export async function main(args: string[]) {
     const parsed = arg(
@@ -37,7 +38,7 @@ export async function main(args: string[]) {
         }
     );
 
-    const files = parsed["_"];
+    const files = parsed["_"].filter((file) => isFile(file));
 
     if (!files.length || parsed["--help"]) {
         console.log(`nomnomd version ${pkg.version}
@@ -80,7 +81,7 @@ Usage:
     if (servePort) {
         watchFiles(files, (file) => {
             console.log(`${file} updated, rebuilding...`);
-            processFiles([file], target, themeCSS, codeTheme, true);
+            processFiles(files, target, themeCSS, codeTheme, true);
         });
         const fallback = files[0].replace(/[.]md$/, ".html");
         serve(target, servePort, fallback);
@@ -159,8 +160,10 @@ function processFiles(
     const script = hotReload ? reloadScript : "";
 
     for (const file of files) {
+        const fileDir = dirname(file);
+
         const text = readFileSync(file);
-        const content = md.render(text.toString());
+        const content = md.render(text.toString(), { cwd: resolve(fileDir) });
 
         const html = wrapContent(content, {
             themeCSS,
@@ -170,11 +173,13 @@ function processFiles(
             footer: frontmatterData.footer,
             script,
         });
-        mkdirSync(join(target, dirname(file)), {
+
+        mkdirSync(join(target, fileDir), {
             recursive: true,
         });
+
         writeFileSync(
-            join(target, dirname(file), basename(file, ".md") + ".html"),
+            join(target, fileDir, basename(file, ".md") + ".html"),
             html
         );
     }
