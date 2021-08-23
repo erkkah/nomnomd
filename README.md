@@ -52,7 +52,7 @@ All [GitHub emojis](https://github.com/ikatyang/emoji-cheat-sheet/blob/master/RE
 [sheetleeten] theme files can be used to override the default theme:
 
 ```shell
-$ npx nomnomd --theme coffee.css docs.md
+$ npx @erkkah/nomnomd --theme coffee.css docs.md
 ```
 
 Creating themes is easy, basically just setting four colors and two fonts.
@@ -60,7 +60,7 @@ Creating themes is easy, basically just setting four colors and two fonts.
 Syntax highlighting is provided by [highlight.js]. The default theme can be changed by specifying a theme name:
 
 ```shell
-$ npx nomnomd --hltheme rainbow docs.md
+$ npx @erkkah/nomnomd --hltheme rainbow docs.md
 ```
 
 ## Working with **nomnomd**
