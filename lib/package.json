@@ -1,6 +1,7 @@
 {
-    "name": "nomnomd",
-    "version": "0.5.0",
+    "name": "@erkkah/nomnomd",
+    "version": "0.5.1",
+    "description": "Markdown with diagrams made easy",
     "author": {
         "name": "Erik Agsjö"
     },
@@ -11,12 +12,12 @@
     "main": "./lib/src/index.js",
     "bin": {
         "nomnomd": "bin/nomnomd",
-        "erkkah/nomnomd": "bin/nomnomd"
+        "@erkkah/nomnomd": "bin/nomnomd"
     },
     "license": "MIT",
     "files": [
-        "./bin/*",
-        "./lib/*"
+        "bin",
+        "lib"
     ],
     "scripts": {
         "build": "tsc",
