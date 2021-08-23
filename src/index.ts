@@ -12,6 +12,7 @@ import { basename, dirname, join, resolve } from "path";
 import MarkdownIt from "markdown-it";
 import Highlight from "highlight.js";
 import Frontmatter from "markdown-it-front-matter";
+import MarkdownItEmoji from "markdown-it-emoji";
 import arg from "arg";
 
 import * as pkg from "../package.json";
@@ -134,6 +135,7 @@ function getMarkdownWithPlugins(): MarkdownIt {
             return "";
         },
     });
+    md.use(MarkdownItEmoji);
     md.use(nomnomlIt);
     md.use(dirListing);
     md.use(makeInclude(getMarkdownWithPlugins));
