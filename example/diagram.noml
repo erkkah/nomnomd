@@ -1,0 +1,4 @@
+#.note: visual=note fill=wheat italic
+
+[<actor> Hacker] -> [<database> Database]
+[Database] -- [<note> Risky!]
