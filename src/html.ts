@@ -40,8 +40,8 @@ const template = html`
                 href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/{codeTheme}.min.css"
             />
             <style>
-                {style}
                 {themeCSS}
+                {style}
             </style>
             <title>{title}</title>
         </head>
