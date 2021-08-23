@@ -2,6 +2,7 @@ import "source-map-support/register";
 import {
     mkdirSync,
     mkdtempSync,
+    readdirSync,
     readFileSync,
     rmSync,
     watch,
@@ -23,7 +24,8 @@ import { reloadScript, wrapContent } from "./html";
 import { serve } from "./serve";
 import { createHash } from "crypto";
 import { tmpdir } from "os";
-import { isFile } from "./files";
+import { isDir, isFile } from "./files";
+import { isAbsolute } from "path/posix";
 
 export async function main(args: string[]) {
     const parsed = arg(
@@ -33,13 +35,15 @@ export async function main(args: string[]) {
             "--theme": String,
             "--hltheme": String,
             "--serve": Number,
+            "-r": Boolean,
+            "--recursive": Boolean,
         },
         {
             argv: args,
         }
     );
 
-    const files = parsed["_"].filter((file) => isFile(file));
+    const files = resolveFiles(parsed["_"], !!parsed["-r"] || !!parsed["--recursive"]);
 
     if (!files.length || parsed["--help"]) {
         console.log(`nomnomd version ${pkg.version}
@@ -53,6 +57,7 @@ Usage:
         [--theme FILE]
         [--hltheme <hljs-theme>]
         [--serve <port>]
+        [--recursive|-r]
         `);
         process.exit(0);
     }
@@ -115,6 +120,35 @@ function watchFiles(files: string[], cb: (file: string) => void) {
     }
 }
 
+function resolveFiles(files: string[], recursive: boolean): string[] {
+    const seen = new Set<string>();
+    const cwd = process.cwd();
+
+    const unresolved = [...files];
+    const resolved: string[] = [];
+
+    while(unresolved.length) {
+        const file = unresolved.shift() || "";
+        if (isDir(file)) {
+            if (recursive) {
+                const files = readdirSync(file).map((item) => join(file, item));
+                unresolved.push(...files);
+            }
+        } else if (isFile(file)) {
+            let abs = file;
+            if (!isAbsolute(abs)) {
+                abs = join(cwd, file);
+            }
+            if (!seen.has(abs)) {
+                seen.add(abs);
+                resolved.push(file);
+            }
+        }
+    }
+
+    return resolved;
+}
+
 function getMarkdownWithPlugins(): MarkdownIt {
     const md = MarkdownIt({
         highlight: (str, lang) => {
@@ -165,6 +199,7 @@ function processFiles(
         const fileDir = dirname(file);
 
         const text = readFileSync(file);
+        frontmatterData = {};
         const content = md.render(text.toString(), { cwd: resolve(fileDir) });
 
         const html = wrapContent(content, {
