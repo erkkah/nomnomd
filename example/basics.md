@@ -5,7 +5,9 @@
 }
 ---
 
-# nomnomd = [nomnoml] + [md] = :heart:
+## Emojis:
+
+[nomnoml] + [md] = :heart:
 
 ## Embedded nomnoml:
 
