@@ -96,11 +96,11 @@ const style = css`
         /*
          * Four-color palette from dark to light, or the other way around.
          */
-        --c0: var(--color0, #111111);
-        --c1: var(--color1, #888888);
-        --c2: var(--color2, #aaaaaa);
-        --c3: var(--color3, #eeeeee);
-
+        --c0: var(--color0, var(--cc0, #111111));
+        --c1: var(--color1, var(--cc1, #888888));
+        --c2: var(--color2, var(--cc2, #aaaaaa));
+        --c3: var(--color3, var(--cc3, #eeeeee));
+    
         /* Fonts. Use browser fonts by default */
         --variable: var(--variable-font, sans-serif);
         --fixed: var(--fixed-font, monospace);
@@ -199,7 +199,7 @@ const style = css`
         align-self: flex-start;
         flex-grow: 0;
         flex-shrink: 1;
-        margin: 12px 0 6px 0;
+        margin: 16px 0 6px 0;
     }
 
     h1 + p,
@@ -309,8 +309,9 @@ const style = css`
     }
 
     /* img styling */
-    img {
+    img, svg {
         max-width: 90vw;
+        border: dotted var(--c0) 0.2px;
     }
 `;
 
