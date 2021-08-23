@@ -41,6 +41,12 @@ and including files:
 ![Changelist](changelist.md)
 ```
 
+Note that only Markdown (.md) files are listed and included.
+
+### Emojis
+
+All [GitHub emojis](https://github.com/ikatyang/emoji-cheat-sheet/blob/master/README.md) should work. :white_check_mark:
+
 ## Themes
 
 [sheetleeten] theme files can be used to override the default theme:
@@ -69,11 +75,14 @@ Usage:
         [--theme FILE]
         [--hltheme <hljs-theme>]
         [--serve <port>]
+        [--recursive|-r]
 ```
 
 Simply running `nomnomd` with a set of Markdown files generates the resulting HTML files in the `build` output folder.
 
-During development, `nomnomd` can be run with the `--serve` flag to launch a little watching, hot-reloading development server on the given port.
+If recursive mode is turned on, all directories passed `nomnomd` will be traversed, and all `.md` files found will be processed.
+
+During development, `nomnomd` can be run with the `--serve` flag to launch a little watching, hot-reloading development server on the given port. No output is written in serve mode.
 
 [sheetleeten]: https://erkkah.github.io/sheetleeten
 [nomnoml]: https://nomnoml.com
