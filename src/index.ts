@@ -43,7 +43,10 @@ export async function main(args: string[]) {
         }
     );
 
-    const files = resolveFiles(parsed["_"], !!parsed["-r"] || !!parsed["--recursive"]);
+    const files = resolveFiles(
+        parsed["_"],
+        !!parsed["-r"] || !!parsed["--recursive"]
+    );
 
     if (!files.length || parsed["--help"]) {
         console.log(`nomnomd version ${pkg.version}
@@ -127,7 +130,7 @@ function resolveFiles(files: string[], recursive: boolean): string[] {
     const unresolved = [...files];
     const resolved: string[] = [];
 
-    while(unresolved.length) {
+    while (unresolved.length) {
         const file = unresolved.shift() || "";
         if (isDir(file)) {
             if (recursive) {
@@ -196,28 +199,34 @@ function processFiles(
     const script = hotReload ? reloadScript : "";
 
     for (const file of files) {
-        const fileDir = dirname(file);
+        try {
+            const fileDir = dirname(file);
 
-        const text = readFileSync(file);
-        frontmatterData = {};
-        const content = md.render(text.toString(), { cwd: resolve(fileDir) });
+            const text = readFileSync(file);
+            frontmatterData = {};
+            const content = md.render(text.toString(), {
+                cwd: resolve(fileDir),
+            });
 
-        const html = wrapContent(content, {
-            themeCSS,
-            codeTheme,
-            title: frontmatterData.title,
-            header: frontmatterData.header,
-            footer: frontmatterData.footer,
-            script,
-        });
+            const html = wrapContent(content, {
+                themeCSS,
+                codeTheme,
+                title: frontmatterData.title,
+                header: frontmatterData.header,
+                footer: frontmatterData.footer,
+                script,
+            });
 
-        mkdirSync(join(target, fileDir), {
-            recursive: true,
-        });
+            mkdirSync(join(target, fileDir), {
+                recursive: true,
+            });
 
-        writeFileSync(
-            join(target, fileDir, basename(file, ".md") + ".html"),
-            html
-        );
+            writeFileSync(
+                join(target, fileDir, basename(file, ".md") + ".html"),
+                html
+            );
+        } catch (ex) {
+            console.log(`Failed to render ${file}: ${ex}`);
+        }
     }
 }
