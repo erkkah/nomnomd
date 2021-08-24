@@ -32,7 +32,7 @@ In both cases, the generated SVG is embedded in the resulting HTML file.
 This allows for creating file lists
 
 ```markdown
-![File listing](./docs)
+![](./docs)
 ```
 
 and including files:
@@ -42,6 +42,14 @@ and including files:
 ```
 
 Note that only Markdown (.md) files are listed and included.
+
+List entries can be decorated by entering a [pupa] template as `alt` text, like this:
+
+```markdown
+![- {title}](./docs)
+```
+
+The template will use data from the JSON frontmatter of each listed file.
 
 ### Emojis
 
@@ -87,3 +95,4 @@ During development, `nomnomd` can be run with the `--serve` flag to launch a lit
 [sheetleeten]: https://erkkah.github.io/sheetleeten
 [nomnoml]: https://nomnoml.com
 [highlight.js]: https://highlightjs.org
+[pupa]: https://www.npmjs.com/package/pupa
