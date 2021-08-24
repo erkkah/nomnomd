@@ -22,7 +22,7 @@
 
 ## File list:
 
-![](subdir)
+![- {title}](subdir)
 
 ## Included markdown:
 
