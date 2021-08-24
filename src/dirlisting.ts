@@ -1,8 +1,10 @@
 import { strict as assert } from "assert";
-import { readdirSync } from "fs";
+import { readdirSync, readFileSync } from "fs";
 import { isAbsolute, join, normalize, relative, resolve } from "path";
 
 import MarkdownIt from "markdown-it";
+import Frontmatter from "markdown-it-front-matter";
+import pupa from "pupa";
 
 import {isDir} from "./files";
 
@@ -49,12 +51,37 @@ function renderDirListing(dir: string, path: string, alt?: string): string {
 
     const listSource = items.map((file) => {
         const html = join(path, file.name.replace(/[.]md$/, ".html"));
-        return `* [${file.name}](${html})`;
+        let description = "";
+        if (alt) {
+            const frontmatterData = extractFrontmatter(join(dir, file.name));
+            description = pupa(alt, frontmatterData);
+        }
+        return `* [${file.name}](${html}) ${description}`;
     });
     const md = MarkdownIt();
-    if (alt) {
-        listSource.unshift(`${alt}`);
-    }
     return md.render(listSource.join("\n"), {});
 }
 
+function extractFrontmatter(path: string): Record<string, string | number> {
+    const md = MarkdownIt();
+    let frontmatterData: Record<string, string | number> = {};
+
+    md.use(Frontmatter, (fm) => {
+        frontmatterData = JSON.parse(fm);
+    });
+
+    try {
+        const fileContents = readFileSync(path);
+        md.render(fileContents.toString(), {});
+    } catch (_) {
+        console.log(`Failed to extract frontmatter from ${path}`)
+    }
+
+    const blankReplacer = new Proxy(frontmatterData, {
+        get: (target, prop) => {
+            return prop in target && typeof(prop) === "string" ? target[prop] : "";
+        },
+    });
+
+    return blankReplacer;
+}
