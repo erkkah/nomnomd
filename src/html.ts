@@ -310,7 +310,8 @@ const style = css`
 
     /* img styling */
     img, svg {
-        max-width: 90vw;
+        max-width: 100%;
+        height: auto;
         border: dotted var(--c0) 0.2px;
     }
 `;
