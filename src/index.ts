@@ -132,12 +132,12 @@ function resolveFiles(files: string[], recursive: boolean): string[] {
 
     while (unresolved.length) {
         const file = unresolved.shift() || "";
-        if (isDir(file) && file.endsWith(".md")) {
+        if (isDir(file)) {
             if (recursive) {
                 const files = readdirSync(file).map((item) => join(file, item));
                 unresolved.push(...files);
             }
-        } else if (isFile(file)) {
+        } else if (isFile(file) && file.endsWith(".md")) {
             let abs = file;
             if (!isAbsolute(abs)) {
                 abs = join(cwd, file);
