@@ -247,7 +247,7 @@ const style = css`
 
     code {
         font-family: var(--fixed);
-        // Slight reduction to compensate for the perceived enlargement of fixed vs variable fonts
+        /* Slight reduction to compensate for the perceived enlargement of fixed vs variable fonts */
         font-size: 0.98em;
     }
 
