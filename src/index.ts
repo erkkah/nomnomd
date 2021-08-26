@@ -2,13 +2,14 @@ import "source-map-support/register";
 import {
     mkdirSync,
     mkdtempSync,
-    readdirSync,
     readFileSync,
     rmSync,
     watch,
     writeFileSync,
 } from "fs";
 import { basename, dirname, join, resolve } from "path";
+import { createHash } from "crypto";
+import { tmpdir } from "os";
 
 import MarkdownIt from "markdown-it";
 import Highlight from "highlight.js";
@@ -22,10 +23,7 @@ import { makeInclude } from "./include";
 import { nomnomlIt } from "./nomnoml";
 import { reloadScript, wrapContent } from "./html";
 import { serve } from "./serve";
-import { createHash } from "crypto";
-import { tmpdir } from "os";
-import { isDir, isFile } from "./files";
-import { isAbsolute } from "path/posix";
+import { copyFiles, resolveFiles, separateFilesByExtension } from "./files";
 
 export async function main(args: string[]) {
     const parsed = arg(
@@ -43,12 +41,15 @@ export async function main(args: string[]) {
         }
     );
 
-    const files = resolveFiles(
+    const allFiles = resolveFiles(
         parsed["_"],
         !!parsed["-r"] || !!parsed["--recursive"]
     );
 
-    if (!files.length || parsed["--help"]) {
+    const [markdownFiles, otherFiles] =
+        separateFilesToMarkdownAndOthers(allFiles);
+
+    if (!markdownFiles.length || parsed["--help"]) {
         console.log(`nomnomd version ${pkg.version}
 
 Usage:
@@ -67,6 +68,14 @@ Usage:
 
     let target = parsed["--out"] ?? "build";
 
+    const themeFile = parsed["--theme"];
+    let themeCSS = "";
+    if (themeFile) {
+        themeCSS = readFileSync(themeFile).toString();
+    }
+
+    const codeTheme = parsed["--hltheme"];
+
     const servePort = parsed["--serve"];
     if (servePort) {
         target = mkdtempSync(join(tmpdir(), "nomnomd"));
@@ -78,21 +87,20 @@ Usage:
         process.on("SIGINT", () => process.exit(0));
     }
 
-    const themeFile = parsed["--theme"];
-    let themeCSS = "";
-    if (themeFile) {
-        themeCSS = readFileSync(themeFile).toString();
+    if (otherFiles.length) {
+        console.log("Copying static files...");
+        copyFiles(otherFiles, target);
     }
-
-    const codeTheme = parsed["--hltheme"];
-    processFiles(files, target, themeCSS, codeTheme, !!servePort);
+    
+    console.log("Processing...");
+    processFiles(markdownFiles, target, themeCSS, codeTheme, !!servePort);
 
     if (servePort) {
-        watchFiles(files, (file) => {
+        watchFiles(markdownFiles, (file) => {
             console.log(`${file} updated, rebuilding...`);
-            processFiles(files, target, themeCSS, codeTheme, true);
+            processFiles(markdownFiles, target, themeCSS, codeTheme, true);
         });
-        const fallback = files[0].replace(/[.]md$/, ".html");
+        const fallback = markdownFiles[0].replace(/[.]md$/, ".html");
         serve(target, servePort, fallback);
         console.log(`Serving on port ${servePort}`);
     }
@@ -121,35 +129,6 @@ function watchFiles(files: string[], cb: (file: string) => void) {
             }
         });
     }
-}
-
-function resolveFiles(files: string[], recursive: boolean): string[] {
-    const seen = new Set<string>();
-    const cwd = process.cwd();
-
-    const unresolved = [...files];
-    const resolved: string[] = [];
-
-    while (unresolved.length) {
-        const file = unresolved.shift() || "";
-        if (isDir(file)) {
-            if (recursive) {
-                const files = readdirSync(file).map((item) => join(file, item));
-                unresolved.push(...files);
-            }
-        } else if (isFile(file) && file.endsWith(".md")) {
-            let abs = file;
-            if (!isAbsolute(abs)) {
-                abs = join(cwd, file);
-            }
-            if (!seen.has(abs)) {
-                seen.add(abs);
-                resolved.push(file);
-            }
-        }
-    }
-
-    return resolved;
 }
 
 function getMarkdownWithPlugins(): MarkdownIt {
@@ -229,4 +208,10 @@ function processFiles(
             console.log(`Failed to render ${file}: ${ex}`);
         }
     }
+}
+
+function separateFilesToMarkdownAndOthers(
+    files: string[]
+): [string[], string[]] {
+    return separateFilesByExtension(files, ".md");
 }
