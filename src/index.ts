@@ -91,7 +91,7 @@ Usage:
         console.log("Copying static files...");
         copyFiles(otherFiles, target);
     }
-    
+
     console.log("Processing...");
     processFiles(markdownFiles, target, themeCSS, codeTheme, !!servePort);
 
@@ -133,6 +133,7 @@ function watchFiles(files: string[], cb: (file: string) => void) {
 
 function getMarkdownWithPlugins(): MarkdownIt {
     const md = MarkdownIt({
+        linkify: true,
         highlight: (str, lang) => {
             if (lang && Highlight.getLanguage(lang)) {
                 try {
@@ -151,6 +152,7 @@ function getMarkdownWithPlugins(): MarkdownIt {
             return "";
         },
     });
+    md.linkify.set({ fuzzyEmail: false, fuzzyIP: false });
     md.use(MarkdownItEmoji);
     md.use(nomnomlIt);
     md.use(dirListing);
