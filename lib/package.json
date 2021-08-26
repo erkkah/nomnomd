@@ -1,7 +1,12 @@
 {
     "name": "@erkkah/nomnomd",
-    "version": "0.6.1",
+    "version": "0.7.0",
     "description": "Markdown with diagrams made easy",
+    "keywords": [
+        "markdown",
+        "nomnoml",
+        "diagrams"
+    ],
     "author": {
         "name": "Erik Agsjö"
     },

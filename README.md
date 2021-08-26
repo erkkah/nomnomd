@@ -25,6 +25,7 @@ By using the `nomnoml` fence code, a diagram can be written directly in a code b
 ```
 
 In both cases, the generated SVG is embedded in the resulting HTML file.
+The generated HTML adds a CSS-only zoom function, to view detailed diagrams up close.
 
 ### Markdown file listings and includes
 
