@@ -314,6 +314,78 @@ const style = css`
         height: auto;
         border: dotted var(--c0) 0.2px;
     }
+
+    input[type="checkbox"].toggle {
+        display: none;
+    }
+
+    .lbl-toggle {
+        display: inline-block;
+        cursor: pointer;
+        position: relative;
+        top: 2em;
+        left: 1ex;
+    }
+
+    .lbl-toggle:before {
+        content: "🔍";
+        filter: opacity(0.1);
+        transition: filter 0.2s ease-in;
+    }
+
+    .lbl-toggle:hover:before {
+        filter: opacity(1);
+    }
+
+    .toggle:checked + .lbl-toggle:before {
+        content: "✕";
+        filter: opacity(1);
+    }
+
+    .toggle:checked + .lbl-toggle {
+        z-index: 3;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        width: 2ex;
+        height: 2ex;
+        border: 2px solid black;
+        background: white;
+        text-align: center;
+        padding: 2px;
+        font-size: xx-large;
+    }
+
+    .toggle:checked + .lbl-toggle + .zoomable {
+        z-index: 1;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+    }
+
+    .zoomable {
+        display: block;
+        transition: backdrop-filter 0.3s ease-out;
+    }
+
+    .zoomable > svg {
+        transition: width 0.1s ease-in;
+        max-height: 90vh;
+    }
+
+    .toggle:checked + .lbl-toggle + .zoomable > svg {
+        z-index: 2;
+        width: 90vw;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
 `;
 
 export const reloadScript = (function reloader() {

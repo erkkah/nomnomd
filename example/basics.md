@@ -5,6 +5,10 @@
 }
 ---
 
+# Basic examples
+
+The rendered version of this page should look something like [this](rendered.png).
+
 ## Emojis:
 
 [nomnoml] + [md] = :heart:

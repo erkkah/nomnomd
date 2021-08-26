@@ -39,12 +39,18 @@ export function nomnomlIt(md: MarkdownIt) {
     });
 }
 
+let nomnomlID = 5150;
+
 function nomnomlToSVG(source: string): string {
     try {
-        return renderSvg(source);
+        const svg = renderSvg(source);
+        return `
+        <input id="nn${nomnomlID}" type="checkbox" class="toggle"/>
+        <label for="nn${nomnomlID++}" class="lbl-toggle"></label>
+        <span class="zoomable">${svg}</span>`
     } catch (err) {
         return (
-            '<pre><code class="language-nomnoml">\n' +
+            '<pre><code class="language-nomnoml hljs">\n' +
             source +
             "\n" +
             "</code></pre>"
