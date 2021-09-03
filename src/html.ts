@@ -323,8 +323,9 @@ const style = css`
         display: inline-block;
         cursor: pointer;
         position: relative;
-        top: 2em;
+        top: 0.5em;
         left: 1ex;
+        z-index: 1;
     }
 
     .lbl-toggle:before {
@@ -368,6 +369,8 @@ const style = css`
     }
 
     .zoomable {
+        position: relative;
+        top: -1.5em;
         display: block;
         transition: backdrop-filter 0.3s ease-out;
     }
