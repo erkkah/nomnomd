@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 
 import MarkdownIt from "markdown-it";
 import Token from "markdown-it/lib/token";
-import mdf from "markdown-it-fence";
+import mdf from "@kaishuu0123/markdown-it-fence";
 import { renderSvg } from "nomnoml";
 import { isAbsolute, join } from "path";
 

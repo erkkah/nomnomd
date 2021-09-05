@@ -1,6 +1,6 @@
 /// <reference types="markdown-it"/>
 
-declare module "markdown-it-fence" {
+declare module "@kaishuu0123/markdown-it-fence" {
 
     interface IOptions {
         marker?: string;

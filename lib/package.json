@@ -1,6 +1,6 @@
 {
     "name": "@erkkah/nomnomd",
-    "version": "0.7.0",
+    "version": "0.7.2",
     "description": "Markdown with diagrams made easy",
     "keywords": [
         "markdown",
@@ -29,11 +29,11 @@
         "prepack": "npm run build"
     },
     "dependencies": {
+        "@kaishuu0123/markdown-it-fence": "^1.0.1",
         "arg": "^5.0.1",
         "highlight.js": "^11.2.0",
         "markdown-it": "^12.2.0",
         "markdown-it-emoji": "^2.0.0",
-        "markdown-it-fence": "^0.1.3",
         "markdown-it-front-matter": "^0.2.3",
         "mime": "^2.5.2",
         "nomnoml": "^1.4.0",
