@@ -8,3 +8,4 @@ export interface WrapOptions {
 }
 export declare function wrapContent(content: string, options?: WrapOptions): string;
 export declare const reloadScript: string;
+export declare const unzoomScript: string;
