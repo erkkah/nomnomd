@@ -32,6 +32,10 @@ The rendered version of this page should look something like [this](rendered.png
 
 ![](included.md)
 
+## Linked markdown:
+
+Link to [markdown file](linked.md).
+
 ## Syntax highlighting:
 
 ```typescript

@@ -21,6 +21,7 @@ import * as pkg from "../package.json";
 import { dirListing } from "./dirlisting";
 import { makeInclude } from "./include";
 import { nomnomlIt } from "./nomnoml";
+import { markdownLinks } from "./links";
 import { reloadScript, unzoomScript, wrapContent } from "./html";
 import { serve } from "./serve";
 import { copyFiles, resolveFiles, separateFilesByExtension } from "./files";
@@ -156,6 +157,7 @@ function getMarkdownWithPlugins(): MarkdownIt {
     md.use(MarkdownItEmoji);
     md.use(nomnomlIt);
     md.use(dirListing);
+    md.use(markdownLinks);
     md.use(makeInclude(getMarkdownWithPlugins));
     return md;
 }

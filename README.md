@@ -25,9 +25,15 @@ By using the `nomnoml` fence code, a diagram can be written directly in a code b
 ```
 
 In both cases, the generated SVG is embedded in the resulting HTML file.
-The generated HTML adds a CSS-only zoom function, to view detailed diagrams up close.
+The generated HTML adds a CSS-based zoom function, to view detailed diagrams up close.
 
-### Markdown file listings and includes
+### Markdown file links, listings and includes
+
+You can link to other Markdown files:
+
+```markdown
+[A link][linked.md]
+```
 
 **nomnomd** overloads the Markdown image syntax to mean "in place" or "here".
 This allows for creating file lists
