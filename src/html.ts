@@ -317,6 +317,7 @@ const style = css`
 
     input[type="checkbox"].toggle {
         display: none;
+        z-index: 1;
     }
 
     .lbl-toggle {
@@ -344,7 +345,7 @@ const style = css`
     }
 
     .toggle:checked + .lbl-toggle {
-        z-index: 3;
+        z-index: 4;
         position: fixed;
         top: 10px;
         left: 10px;
@@ -358,13 +359,13 @@ const style = css`
     }
 
     .toggle:checked + .lbl-toggle + .zoomable {
-        z-index: 1;
+        z-index: 2;
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.3);
         backdrop-filter: blur(5px);
     }
 
@@ -381,12 +382,14 @@ const style = css`
     }
 
     .toggle:checked + .lbl-toggle + .zoomable > svg {
-        z-index: 2;
+        z-index: 3;
         width: 90vw;
         position: fixed;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
+        background-color: var(--c1);
+        border: 2px solid var(--c0);
     }
     
 `;
