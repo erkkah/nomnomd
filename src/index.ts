@@ -21,7 +21,7 @@ import * as pkg from "../package.json";
 import { dirListing } from "./dirlisting";
 import { makeInclude } from "./include";
 import { nomnomlIt } from "./nomnoml";
-import { reloadScript, wrapContent } from "./html";
+import { reloadScript, unzoomScript, wrapContent } from "./html";
 import { serve } from "./serve";
 import { copyFiles, resolveFiles, separateFilesByExtension } from "./files";
 
@@ -177,7 +177,7 @@ function processFiles(
 
     mkdirSync(target, { recursive: true });
 
-    const script = hotReload ? reloadScript : "";
+    const script = unzoomScript + (hotReload ? reloadScript : "");
 
     for (const file of files) {
         try {

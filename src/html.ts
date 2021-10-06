@@ -415,3 +415,17 @@ export const reloadScript = (function reloader() {
     
     setTimeout(checkLastUpdated, 1000);    
 }).toString() + ";reloader();";
+
+export const unzoomScript = (function registerUnzoomHandler() {
+    document.addEventListener("keydown", (event) => {
+        if (event.code === "Escape") {
+            const inputs = document.getElementsByTagName<"input">("input");
+            for (const i in inputs) {
+                const input = inputs[i];
+                if (input.type == "checkbox") {
+                    input.checked = false;
+                }
+            }
+        }
+    });
+}).toString() + ";registerUnzoomHandler();";
